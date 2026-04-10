@@ -8,13 +8,13 @@ print(df)
 print(df.isnull().sum())
 
 # --- EDA ---
-df.gender.hist()
+df.gender.hist()    #gender histogram
 plt.show()
 
-df.math_score.hist()
+df.math_score.hist()    #math_score histogram
 plt.show()
 
-df.reading_score.hist()
+df.reading_score.hist()    #reading_score histogram
 plt.show()
 
 # Boxplot for math_score
