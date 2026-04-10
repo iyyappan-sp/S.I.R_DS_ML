@@ -42,7 +42,6 @@ print(df.isna().sum())
 # Add new column 'total_score'
 df['total_score'] = df['math_score'] + df['reading_score'] + df['writing_score']
 print(df)
-
 # Add new column 'avg_score' (corrected calculation)
 df['avg_score'] = df['total_score'] / 3
 print(df)
