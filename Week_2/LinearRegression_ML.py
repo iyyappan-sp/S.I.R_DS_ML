@@ -33,3 +33,8 @@ model = LinearRegression()
 model.fit(X,Y)    #input, output
 print(model.coef_)
 print(model.intercept_)
+
+# save the model and load the model a new file
+
+import joblib
+joblib.dump(model, 'salary_model.pkl')
