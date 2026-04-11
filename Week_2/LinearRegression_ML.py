@@ -18,3 +18,18 @@ print(df.isnull().sum(axis = 0))
 from word2number import w2n
 df.experience = df.experience.apply(w2n.word_to_num)
 print(df)
+
+#train the model
+
+from sklearn.linear_model import LinearRegression
+
+X = df.drop('salary', axis = 1)
+Y = df['salary']
+print(X)
+print(Y)
+
+# initialize the model
+model = LinearRegression()
+model.fit(X,Y)    #input, output
+print(model.coef_)
+print(model.intercept_)
