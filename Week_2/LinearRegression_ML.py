@@ -12,3 +12,9 @@ print(df)
 df = df.fillna(df.median(numeric_only=True))
 print(df)
 print(df.isnull().sum(axis = 0))
+
+# working a new python library word2number
+
+from word2number import w2n
+df.experience = df.experience.apply(w2n.word_to_num)
+print(df)
