@@ -13,3 +13,9 @@ from sklearn.linear_model import LinearRegression
 X = df.drop('price', axis=1)
 Y = df['price']
 
+#model initialize
+model = LinearRegression()
+model.fit(X,Y)
+print(model.coef_)
+print(model.intercept_)
+
