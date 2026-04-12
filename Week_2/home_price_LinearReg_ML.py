@@ -19,3 +19,7 @@ model.fit(X,Y)
 print(model.coef_)
 print(model.intercept_)
 
+#save the model and load the model
+import joblib
+joblib.dump(model, 'home_price_model.pkl')
+
