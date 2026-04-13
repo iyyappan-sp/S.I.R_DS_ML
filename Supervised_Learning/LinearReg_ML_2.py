@@ -1,4 +1,5 @@
 import pandas as pd
+from matplotlib import pyplot as plt
 
 df = pd.read_csv("Fish.csv")
 data = df.copy()    # copy of data
@@ -17,3 +18,7 @@ print(sp)
 
 sp = pd.DataFrame(sp)
 print(sp)
+
+import seaborn as sns
+sns.barplot(x=sp.index, y=sp.values)
+plt.show()
