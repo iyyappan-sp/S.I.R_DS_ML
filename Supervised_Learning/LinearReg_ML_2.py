@@ -11,3 +11,9 @@ print(df.head())
 print(df.info())
 print(df.describe())
 print(df.isnull().sum())
+
+sp = df.Species.value_counts()
+print(sp)
+
+sp = pd.DataFrame(sp)
+print(sp)
