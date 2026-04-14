@@ -1,3 +1,5 @@
+import warnings
+warnings.filterwarnings('ignore')
 import pandas as pd
 from matplotlib import pyplot as plt
 
@@ -59,3 +61,28 @@ print(model.intercept_)
 
 import joblib
 joblib.dump(model, 'weight_predict.pkl')
+
+y_pred = model.predict(X_test)
+print(y_pred)
+y_pred = pd.DataFrame(y_pred, columns = ['Predicted_Weight'])
+print(y_pred.head())
+
+y_test = pd.DataFrame(y_test)
+print(y_test.head())
+
+y_test = y_test.reset_index(drop = True)
+print(y_test.head())
+
+y_output = pd.concat([y_test,y_pred], axis = 1)
+print(y_output)
+
+from sklearn.metrics import r2_score
+r2 = r2_score(y_test, y_pred)
+print(r2)
+
+print(X_train.head(2))
+
+import numpy as np
+new_data = np.array([[23,25,30,11,14]])
+prediction = model.predict(new_data)
+print(prediction)
