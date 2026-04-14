@@ -25,10 +25,10 @@ import seaborn as sns
 sns.barplot(x="Species", y="count", data=sp)
 plt.show()
 
-corr_matrix = df.select_dtypes(include="number").corr()
-print(corr_matrix)
+corr = df.select_dtypes(include="number").corr()
+print(corr)
 
-sns.heatmap(corr_matrix, annot=True, cmap='YlGnBu')
+sns.heatmap(corr, annot=True, cmap='YlGnBu')
 plt.show()
 
 sns.pairplot(df, kind='scatter', hue='Species')
