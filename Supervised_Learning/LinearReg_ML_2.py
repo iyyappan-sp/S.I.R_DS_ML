@@ -20,5 +20,42 @@ sp = pd.DataFrame(sp)
 print(sp)
 
 import seaborn as sns
-sns.barplot(x=sp.index, y=sp.values)
+sns.barplot(x="Species", y="count", data=sp)
 plt.show()
+
+corr_matrix = df.select_dtypes(include="number").corr()
+print(corr_matrix)
+
+sns.heatmap(corr_matrix, annot=True, cmap='YlGnBu')
+plt.show()
+
+sns.pairplot(df, kind='scatter', hue='Species')
+plt.show()
+
+sns.boxplot(x=df.Weight)
+plt.show()
+
+df = df[df.Weight <=1500]
+sns.boxplot(x=df.Weight)
+plt.show()
+print(df.shape)
+print(df.head())
+
+y = df.Weight
+print(y)
+
+X = df.iloc[:,2:7]  #row,column(Species and Weight columns are not include)
+print(X)
+
+from sklearn.model_selection import train_test_split
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2)
+
+
+from sklearn.linear_model import LinearRegression
+model = LinearRegression()
+model.fit(X_train, y_train)
+print(model.coef_)
+print(model.intercept_)
+
+import joblib
+joblib.dump(model, 'weight_predict.pkl')
