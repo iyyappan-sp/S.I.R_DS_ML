@@ -19,6 +19,8 @@ import pandas as pd
 import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
+import warnings
+warnings.filterwarnings("ignore")
 
 # step:2: Read Dataset
 
@@ -35,4 +37,17 @@ print(df.isnull().sum())     # it shows how many null/missing values
 print((df.isnull().sum() / df.shape[0]) * 100)    # it shows percentage of overall missing data
 print(df.duplicated().sum())    # it shows how many duplicated values on the dataset
 
+# identifiying garbage values
+for i in df.select_dtypes(include="object").columns:
+    print(df[i].value_counts())
+    print("***"*10)
+
+#step:4---- Exploratory Data Analysis(EDA)
+print(df.describe().T)     # 'T' means transpose
+print(df.describe(include="object"))
+
+# histogram for understand the distribution
+for i in df.select_dtypes(include="number").columns:
+    sns.histplot(data=df, x=i)
+    plt.show()
 
