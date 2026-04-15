@@ -66,3 +66,9 @@ for i in ['Year', 'Adult Mortality', 'infant deaths',
     sns.scatterplot(data=df, x=i, y='Life expectancy ')
     plt.show()
 
+# correlation with heatmap for interpret the relation and multicolliniarity
+correl =df.select_dtypes(include="number").corr()
+print(correl)
+plt.figure(figsize=(15,15))
+sns.heatmap(correl, annot=True)
+plt.show()
