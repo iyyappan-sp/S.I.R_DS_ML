@@ -51,3 +51,8 @@ for i in df.select_dtypes(include="number").columns:
     sns.histplot(data=df, x=i)
     plt.show()
 
+# boxplot-to-identify outliers
+for i in df.select_dtypes(include="number").columns:
+    sns.boxplot(data=df, x=i)
+    plt.show()
+
