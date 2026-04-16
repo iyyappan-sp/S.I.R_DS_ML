@@ -118,3 +118,8 @@ for i in ['GDP', 'Total expenditure', ' thinness  1-19 years', ' thinness 5-9 ye
     sns.boxplot(x=df[i])
     plt.show()
 
+
+#step:7 - Duplicates & Garbage value treatments
+# we already do treatments of garbage values
+df = df.drop_duplicates()
+print(df)   # there is no duplicates
