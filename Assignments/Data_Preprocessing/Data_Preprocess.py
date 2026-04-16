@@ -47,31 +47,31 @@ print(df.describe().T)     # 'T' means transpose
 print(df.describe(include="object"))
 
 # histogram for understand the distribution
-for i in df.select_dtypes(include="number").columns:
-    sns.histplot(data=df, x=i)
-    plt.show()
-
-# boxplot-to-identify outliers
-for i in df.select_dtypes(include="number").columns:
-    sns.boxplot(data=df, x=i)
-    plt.show()
-
-# scatter plot for understand the relationship
-print(df.select_dtypes(include="number").columns)
-for i in ['Year', 'Adult Mortality', 'infant deaths',
-       'Alcohol', 'percentage expenditure', 'Hepatitis B', 'Measles ', ' BMI ',
-       'under-five deaths ', 'Polio', 'Total expenditure', 'Diphtheria ',
-       ' HIV/AIDS', 'GDP', 'Population', ' thinness  1-19 years',
-       ' thinness 5-9 years', 'Income composition of resources', 'Schooling']:
-    sns.scatterplot(data=df, x=i, y='Life expectancy ')
-    plt.show()
-
-# correlation with heatmap for interpret the relation and multicolliniarity
-correl =df.select_dtypes(include="number").corr()
-print(correl)
-plt.figure(figsize=(15,15))
-sns.heatmap(correl, annot=True)
-plt.show()
+# for i in df.select_dtypes(include="number").columns:
+#     sns.histplot(data=df, x=i)
+#     plt.show()
+#
+# # boxplot-to-identify outliers
+# for i in df.select_dtypes(include="number").columns:
+#     sns.boxplot(data=df, x=i)
+#     plt.show()
+#
+# # scatter plot for understand the relationship
+# print(df.select_dtypes(include="number").columns)
+# for i in ['Year', 'Adult Mortality', 'infant deaths',
+#        'Alcohol', 'percentage expenditure', 'Hepatitis B', 'Measles ', ' BMI ',
+#        'under-five deaths ', 'Polio', 'Total expenditure', 'Diphtheria ',
+#        ' HIV/AIDS', 'GDP', 'Population', ' thinness  1-19 years',
+#        ' thinness 5-9 years', 'Income composition of resources', 'Schooling']:
+#     sns.scatterplot(data=df, x=i, y='Life expectancy ')
+#     plt.show()
+#
+# # correlation with heatmap for interpret the relation and multicolliniarity
+# correl =df.select_dtypes(include="number").corr()
+# print(correl)
+# plt.figure(figsize=(15,15))
+# sns.heatmap(correl, annot=True)
+# plt.show()
 
 # step:5 - Missing Values treatments
 
@@ -97,3 +97,23 @@ impute = KNNImputer()
 for i in df.select_dtypes(include='number').columns:
     df[i] = impute.fit_transform(df[[i]])
 print(df.isnull().sum())
+
+#step:6 - Outliers treatments
+# we already notice the outliers treatment are only for the continuous numerical columns
+# decide whether to do outliers treatment or not , if do how???
+
+def wisker(col):
+    q1,q3=np.percentile(col,[25,75])
+    iqr = q3 - q1
+    low_wisk = q1-1.5*iqr
+    up_wisk = q3+1.5*iqr
+    return low_wisk,up_wisk
+
+for i in ['GDP', 'Total expenditure', ' thinness  1-19 years', ' thinness 5-9 years']:
+    low_wisk,up_wisk=wisker(df[i])
+    df[i]=np.where(df[i]<low_wisk,low_wisk,df[i])
+    df[i]=np.where(df[i]>up_wisk,up_wisk,df[i])
+
+for i in ['GDP', 'Total expenditure', ' thinness  1-19 years', ' thinness 5-9 years']:
+    sns.boxplot(x=df[i])
+    plt.show()
