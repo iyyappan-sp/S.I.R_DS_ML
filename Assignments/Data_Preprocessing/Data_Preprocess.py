@@ -72,3 +72,21 @@ print(correl)
 plt.figure(figsize=(15,15))
 sns.heatmap(correl, annot=True)
 plt.show()
+
+# step:5 - Missing Values treatments
+
+# choose the method of imputing missing values
+#like you choose numeric columns use mean,median and KNNImputer
+# but you choose categorical columns use mode
+
+""" mean --- only for numerical data
+ median --- only for numerical data
+ mode --- Both numerical & categorical data
+ KNN Imputer --- Mostly numeric data (after encoding) """
+
+print(df.info())
+print(df.isnull().sum())
+
+for i in [' BMI ','Polio','Income composition of resources']:
+    df[i].fillna(df[i].median(),inplace=True)
+print(df.isnull().sum())  #BMI, Polio, Income composition of resources---0
