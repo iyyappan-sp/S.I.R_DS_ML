@@ -8,8 +8,7 @@ step:4---- Exploratory Data Analysis
 step:5---- Missing Values treatments
 step:6---- Outliers treatments
 step:7---- Duplicates & Garbage value treatments
-step:8---- Normalization
-step:9---- Encoding of data
+step:8---- Encoding of data
 
 """
 
@@ -123,3 +122,12 @@ for i in ['GDP', 'Total expenditure', ' thinness  1-19 years', ' thinness 5-9 ye
 # we already do treatments of garbage values
 df = df.drop_duplicates()
 print(df)   # there is no duplicates
+
+# step:8 - Encoding of data
+
+""" Encoding data is two way one is one-hot-encoding and another one is label_encoding
+ one-hot-encoding---> it will create dummies for the each category
+ label_encoding---> it is used to ordered data """
+
+dummy = pd.get_dummies(data=df,columns=['Country', 'Status'], drop_first=True)
+print(dummy.head())
