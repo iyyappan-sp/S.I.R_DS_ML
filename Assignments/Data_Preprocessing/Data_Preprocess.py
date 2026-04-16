@@ -46,7 +46,7 @@ for i in df.select_dtypes(include="object").columns:
 print(df.describe().T)     # 'T' means transpose
 print(df.describe(include="object"))
 
-histogram for understand the distribution
+# histogram for understand the distribution
 for i in df.select_dtypes(include="number").columns:
     sns.histplot(data=df, x=i)
     plt.show()
