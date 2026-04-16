@@ -90,3 +90,10 @@ print(df.isnull().sum())
 for i in [' BMI ','Polio','Income composition of resources']:
     df[i].fillna(df[i].median(),inplace=True)
 print(df.isnull().sum())  #BMI, Polio, Income composition of resources---0
+
+# KNN Imputer is avg from nearest values
+from sklearn.impute import KNNImputer
+impute = KNNImputer()
+for i in df.select_dtypes(include='number').columns:
+    df[i] = impute.fit_transform(df[[i]])
+print(df.isnull().sum())
