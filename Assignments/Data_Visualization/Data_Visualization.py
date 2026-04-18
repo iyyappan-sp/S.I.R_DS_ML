@@ -28,3 +28,8 @@ plt.title("Bar Chart")
 plt.xlabel('Day')
 plt.ylabel('Tip')
 plt.show()
+
+# histogram of total bills
+plt.hist(data['total_bill'])
+plt.title('Histogram')
+plt.show()
