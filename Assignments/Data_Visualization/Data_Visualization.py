@@ -21,3 +21,10 @@ plt.title('Scatter Plot 2')
 plt.xlabel('Day')
 plt.ylabel('Tip')
 plt.show()
+
+# bar chart with day against trip
+plt.bar(data['day'], data['tip'])
+plt.title("Bar Chart")
+plt.xlabel('Day')
+plt.ylabel('Tip')
+plt.show()
