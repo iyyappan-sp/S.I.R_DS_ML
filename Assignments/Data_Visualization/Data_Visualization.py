@@ -13,3 +13,11 @@ plt.xlabel('Day')
 plt.ylabel('Tip')
 plt.colorbar()
 plt.show()
+
+# scatter plot 2
+plt.plot(data['tip'])
+plt.plot(data['size'])
+plt.title('Scatter Plot 2')
+plt.xlabel('Day')
+plt.ylabel('Tip')
+plt.show()
