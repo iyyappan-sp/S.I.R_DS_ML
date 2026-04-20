@@ -34,3 +34,11 @@ print(result_df)    # model make wrong prediction
 from sklearn.metrics import confusion_matrix
 confusion_mat = confusion_matrix(y_test, y_pred)
 print(confusion_mat)
+
+import matplotlib.pyplot as plt
+import seaborn as sns
+data  = {'y_Actual': y_test, 'y_Predicted': y_pred}
+df = pd.DataFrame(data, columns = ['y_Actual', 'y_Predicted'])
+clf_confusion_matrix = pd.crosstab(df['y_Predicted'], df['y_Actual'], rownames=['Actual'], colnames=['Predicted'])
+sns.heatmap(clf_confusion_matrix, annot = True)
+plt.show()
