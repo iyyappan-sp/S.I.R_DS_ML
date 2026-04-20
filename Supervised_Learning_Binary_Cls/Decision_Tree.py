@@ -29,4 +29,8 @@ print(y_test_df)
 y_test_df = y_test_df.reset_index(drop = True)
 print(y_test_df)
 result_df = pd.concat([y_test_df, y_predict_df], axis =1)
-print(result_df)
+print(result_df)    # model make wrong prediction
+
+from sklearn.metrics import confusion_matrix
+confusion_mat = confusion_matrix(y_test, y_pred)
+print(confusion_mat)
