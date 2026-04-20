@@ -21,4 +21,12 @@ from sklearn import tree
 clf = tree.DecisionTreeClassifier()
 clf.fit(X_train,y_train)
 y_pred = clf.predict(X_test)
-print(y_pred)
+print(y_pred)    # this will show upon numpy array
+y_predict_df = pd.DataFrame(y_pred, columns = ['Predicted_value'])
+print(y_predict_df)
+y_test_df = pd.DataFrame(y_test)    # it is show allways random data's
+print(y_test_df)
+y_test_df = y_test_df.reset_index(drop = True)
+print(y_test_df)
+result_df = pd.concat([y_test_df, y_predict_df], axis =1)
+print(result_df)
