@@ -7,8 +7,8 @@ print(dataset.describe())
 counts = dataset['Outcome'].value_counts()
 print(counts)
 
-X = dataset.iloc[:, 0:7]
-y = dataset.iloc[:,8]
+X = dataset.drop('Outcome', axis=1)
+y = dataset['Outcome']
 print(X)
 print(y)
 
