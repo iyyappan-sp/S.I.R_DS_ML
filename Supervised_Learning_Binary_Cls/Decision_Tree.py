@@ -39,6 +39,26 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 data  = {'y_Actual': y_test, 'y_Predicted': y_pred}
 df = pd.DataFrame(data, columns = ['y_Actual', 'y_Predicted'])
-clf_confusion_matrix = pd.crosstab(df['y_Predicted'], df['y_Actual'], rownames=['Actual'], colnames=['Predicted'])
+# Actual first(Rows), Predicted second(Columns)
+clf_confusion_matrix = pd.crosstab(df['y_Actual'], df['y_Predicted'], rownames=['Actual'], colnames=['Predicted'])
 sns.heatmap(clf_confusion_matrix, annot = True)
 plt.show()
+
+from sklearn.ensemble import RandomForestClassifier
+clf2 = RandomForestClassifier(n_estimators=200)    # how many trees are in my forest
+clf2.fit(X_train, y_train)
+y_pred_rf = clf2.predict(X_test)
+print(y_pred_rf)
+
+confusion_mat_rf = confusion_matrix(y_test, y_pred_rf)
+print(confusion_mat_rf)
+
+data  = {'y_Actual': y_test, 'y_Predicted': y_pred_rf}
+df = pd.DataFrame(data, columns = ['y_Actual', 'y_Predicted'])
+# Actual first(Rows), Predicted second(Columns)
+clf_confusion_matrix = pd.crosstab(df['y_Actual'], df['y_Predicted'], rownames=['Actual'], colnames=['Predicted'])
+sns.heatmap(clf_confusion_matrix, annot = True)
+plt.show()
+
+import joblib
+joblib.dump(clf2, 'diabetes_rf.pkl')
