@@ -126,5 +126,6 @@ def recommend():
         return jsonify({"status": "error", "message": str(e)}), 400
 
 
+# ✅ Fix - binds to 0.0.0.0
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
