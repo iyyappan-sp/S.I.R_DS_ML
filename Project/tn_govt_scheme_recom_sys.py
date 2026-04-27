@@ -142,3 +142,40 @@ for col in ['age', 'annual_income', 'family_size']:
 sns.boxplot(data=citizens, x='annual_income')
 plt.title("Outlier Check After – annual_income")
 plt.show()
+
+# step:6: ---- Eligibility Rules
+def check_eligibility(person, scheme):
+    # disability match check
+    if scheme['category'] == 'Disability':
+        if scheme['scheme_name'] == 'Transgender Welfare Scheme':
+            if person['gender'] != 'Transgender':
+                return False
+        elif person.get('disability_status', 'No') != 'Yes':
+            return False
+
+    # caste match check
+    if scheme['caste'] != 'Any':
+        if scheme['caste'] == 'BC/MBC' and person['caste'] not in ('BC', 'MBC'):
+            return False
+        if scheme['caste'] == 'SC/ST' and person['caste'] not in ('SC', 'ST'):
+            return False
+        if scheme['caste'] not in ('BC/MBC', 'SC/ST') and person['caste'] != scheme['caste']:
+            return False
+
+    # occupation match check
+    if scheme['occupation'] != 'Any':
+        if person['occupation'] not in [o.strip() for o in scheme['occupation'].split('/')]:
+            return False
+
+    # education match check
+    if scheme['education'] != 'Any':
+        if edu_levels.get(person['education'], 0) < edu_levels.get(scheme['education'], 0):
+            return False
+
+    return (
+        (scheme['gender'] == 'Any' or person['gender'] == scheme['gender']) and
+        scheme['min_age'] <= person['age'] <= scheme['max_age'] and
+        person['annual_income'] <= scheme['income_limit'] and
+        (scheme['marital_status'] == 'Any' or person['marital_status'] == scheme['marital_status']) and
+        (scheme['district'] == 'Any' or person['district_type'] == scheme['district'])
+    )
