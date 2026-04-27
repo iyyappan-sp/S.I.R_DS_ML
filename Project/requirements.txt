@@ -1,0 +1,17 @@
+# Data Manipulation & Math
+pandas
+numpy
+
+# Visualization (for the training script)
+matplotlib
+seaborn
+
+# Machine Learning
+scikit-learn
+imblearn
+
+# Model Persistence & Web API
+joblib
+flask
+
+# pip install -r requirements.txt
