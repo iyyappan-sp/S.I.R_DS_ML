@@ -220,3 +220,34 @@ for _, row in sample.iterrows():
 
 training_data = pd.DataFrame(training_rows)
 print(f"Done. {training_data.shape} | Eligible: {training_data['eligible'].mean()*100:.1f}% | {time.time()-start:.1f}s")
+
+# step:8: ---- Encoding & Splitting Data
+# Encode categorical columns
+cat_cols = ['gender', 'caste', 'occupation', 'education', 'marital_status', 'disability_status', 'district_type']
+encoders = {}
+
+for col in cat_cols:
+    le = LabelEncoder()
+    training_data[col] = le.fit_transform(training_data[col].astype(str))
+    encoders[col] = le
+
+feature_cols = [
+    'age', 'gender', 'caste', 'occupation', 'education', 'annual_income',
+    'marital_status', 'disability_status', 'district_type', 'family_size',
+    'edu_rank', 'scheme_min_age', 'scheme_max_age', 'scheme_income_limit',
+    'scheme_benefit_amount', 'age_in_range', 'income_ok', 'income_ratio', 'age_ratio'
+]
+
+X = training_data[feature_cols]
+y = training_data['eligible']
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
+
+print("Train shape:", X_train.shape)
+print("Test shape :", X_test.shape)
+
+# class distribution before SMOTE (Synthetic Minority Over-sampling Technique)
+plt.bar(['Not Eligible', 'Eligible'], training_data['eligible'].value_counts().values, color=['#2980B9', '#27AE60'])
+plt.title("Class Distribution (Before SMOTE)")
+plt.ylabel("Count")
+plt.show()
