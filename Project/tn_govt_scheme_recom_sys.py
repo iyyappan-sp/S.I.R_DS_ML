@@ -262,3 +262,16 @@ plt.bar(['Not Eligible', 'Eligible'], [(y_train==0).sum(), y_train.sum()], color
 plt.title("Class Distribution (After SMOTE)")
 plt.ylabel("Count")
 plt.show()
+
+# step:10: ---- Decision Tree
+print("\n--- Decision Tree ---")
+dt_model = DecisionTreeClassifier(max_depth=12, random_state=42)
+dt_model.fit(X_train, y_train)
+y_pred = dt_model.predict(X_test)
+y_prob = dt_model.predict_proba(X_test)[:, 1]
+print(f"Accuracy : {accuracy_score(y_test, y_pred):.4f}")
+print(f"F1 Score : {f1_score(y_test, y_pred):.4f}")
+print(f"ROC-AUC  : {roc_auc_score(y_test, y_prob):.4f}")
+sns.heatmap(pd.crosstab(y_test, y_pred, rownames=['Actual'], colnames=['Predicted']), annot=True, fmt='d', cmap='Blues')
+plt.title("Decision Tree - Confusion Matrix")
+plt.show()
