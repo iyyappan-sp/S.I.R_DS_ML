@@ -275,3 +275,84 @@ print(f"ROC-AUC  : {roc_auc_score(y_test, y_prob):.4f}")
 sns.heatmap(pd.crosstab(y_test, y_pred, rownames=['Actual'], colnames=['Predicted']), annot=True, fmt='d', cmap='Blues')
 plt.title("Decision Tree - Confusion Matrix")
 plt.show()
+
+# step:11: ---- Random Forest
+print("\n--- Random Forest ---")
+rf_model = RandomForestClassifier(n_estimators=100, random_state=42, n_jobs=-1)
+rf_model.fit(X_train, y_train)
+y_pred_rf = rf_model.predict(X_test)
+y_prob_rf  = rf_model.predict_proba(X_test)[:, 1]
+print(f"Accuracy : {accuracy_score(y_test, y_pred_rf):.4f}")
+print(f"F1 Score : {f1_score(y_test, y_pred_rf):.4f}")
+print(f"ROC-AUC  : {roc_auc_score(y_test, y_prob_rf):.4f}")
+sns.heatmap(pd.crosstab(y_test, y_pred_rf, rownames=['Actual'], colnames=['Predicted']), annot=True, fmt='d', cmap='Blues')
+plt.title("Random Forest - Confusion Matrix")
+plt.show()
+
+# step:12: ---- ROC Curve(Receiver Operating Characteristic) curve shows how well the model distinguishes between classes
+# AUC(Area Under Curve) score tells the overall performance of the model
+# dt_fpr - Decision Tree False Positive Rate
+# dt_tpr - Decision Tree True Positive Rate
+# rf_fpr - Random Forest False Positive Rate
+# rf_tpr - Random Forest True Positive Rate
+dt_fpr, dt_tpr, _ = roc_curve(y_test, y_prob)
+rf_fpr, rf_tpr, _ = roc_curve(y_test, y_prob_rf)
+plt.plot(dt_fpr, dt_tpr, label=f"Decision Tree (AUC: {roc_auc_score(y_test, y_prob):.4f})")
+plt.plot(rf_fpr, rf_tpr, label=f"Random Forest (AUC: {roc_auc_score(y_test, y_prob_rf):.4f})")
+plt.plot([0, 1], [0, 1], 'k--', label="Random Guess")
+plt.title("ROC Curve")
+plt.xlabel("False Positive Rate")
+plt.ylabel("True Positive Rate")
+plt.legend()
+plt.show()
+
+# step:13: ---- Feature Engineering
+importances = pd.Series(rf_model.feature_importances_, index=feature_cols).sort_values()
+plt.barh(importances.index, importances.values, color='steelblue')
+plt.title("Feature Importances - Random Forest")
+plt.xlabel("Score")
+plt.show()
+
+# step:14: ---- Recommendation Engine
+def recommend(person):
+    area = get_area_type(person.get('district', 'Chennai'))
+    edu_rank = edu_levels.get(person.get('education', 'No Formal Education'), 0)
+    person['district_type'] = area
+
+    encode = lambda col, val: int(encoders[col].transform([val])[0]) if val in encoders[col].classes_ else 0
+
+    matrix = []
+    for _, scheme in schemes.iterrows():
+        matrix.append([
+            person['age'], encode('gender', person['gender']), encode('caste', person['caste']),
+            encode('occupation', person['occupation']), encode('education', person['education']),
+            person['annual_income'], encode('marital_status', person['marital_status']),
+            encode('disability_status', person['disability_status']), encode('district_type', area),
+            person.get('family_size', 4), edu_rank,
+            scheme['min_age'], scheme['max_age'], scheme['income_limit'], scheme['benefit_amount'],
+            int(scheme['min_age'] <= person['age'] <= scheme['max_age']),
+            int(person['annual_income'] <= scheme['income_limit']),
+            round(person['annual_income'] / scheme['income_limit'], 4),
+            round(person['age'] / scheme['max_age'], 4)
+        ])
+
+    eligible = {s['scheme_name'] for _, s in schemes.iterrows() if check_eligibility(person, s)}
+    scores = rf_model.predict_proba(np.array(matrix, dtype=float))[:, 1]
+
+    result = schemes[['scheme_name', 'category', 'benefit_amount', 'benefit_type', 'description', 'income_limit']].copy()
+    result['score'] = scores
+    result = result[result['scheme_name'].isin(eligible)]
+    return result.sort_values('score', ascending=False).reset_index(drop=True)
+
+# step:15: ---- Save For API
+import joblib
+# We bundle the trained model and encoders so the API doesn't need the input() functions
+project_bundle = {
+    'model': rf_model,
+    'encoders': encoders,
+    'edu_levels': edu_levels,
+    'coastal': list(coastal_districts),
+    'urban': list(urban_districts)
+}
+joblib.dump(project_bundle, 'scheme_project.pkl')
+print("\n[SUCCESS] Model trained and assets saved for Flask API.")
