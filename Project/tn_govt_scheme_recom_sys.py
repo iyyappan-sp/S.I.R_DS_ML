@@ -251,3 +251,14 @@ plt.bar(['Not Eligible', 'Eligible'], training_data['eligible'].value_counts().v
 plt.title("Class Distribution (Before SMOTE)")
 plt.ylabel("Count")
 plt.show()
+
+# step:9: ---- SMOTE to fix class imbalance
+smote = SMOTE(random_state=42)
+X_train, y_train = smote.fit_resample(X_train, y_train)
+print(f"After SMOTE → Train: {len(X_train):,} | Eligible: {y_train.sum():,} | Not Eligible: {(y_train==0).sum():,}")
+
+# class distribution after SMOTE
+plt.bar(['Not Eligible', 'Eligible'], [(y_train==0).sum(), y_train.sum()], color=['#2980B9', '#27AE60'])
+plt.title("Class Distribution (After SMOTE)")
+plt.ylabel("Count")
+plt.show()
