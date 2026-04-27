@@ -120,3 +120,25 @@ sns.barplot(x=schemes['category'].value_counts().values, y=schemes['category'].v
 plt.title(f"Schemes by Category  (Mode: {schemes['category'].mode()[0]})")
 plt.xlabel("Count")
 plt.show()
+
+# step:5: ---- Outliers treatments
+# boxplot to identify outliers – only for numerical columns
+for col in citizens.select_dtypes(include='number').columns:
+    sns.boxplot(data=citizens, x=col)
+    plt.title(f"Outlier Check – {col}")
+    plt.show()
+
+# IQR method to find and cap outliers
+# only applicable for continuous numerical columns (age, annual_income, family_size)
+# edu_rank is ordinal (ranked categories) so we skip it
+for col in ['age', 'annual_income', 'family_size']:
+    q1, q3 = np.percentile(citizens[col], [25, 75])
+    iqr = q3 - q1
+    lower = q1 - 1.5 * iqr
+    upper = q3 + 1.5 * iqr
+    print(f"  {col} → outliers capped to ({lower:.0f} – {upper:.0f})")
+    citizens[col] = citizens[col].clip(lower=lower, upper=upper)
+
+sns.boxplot(data=citizens, x='annual_income')
+plt.title("Outlier Check After – annual_income")
+plt.show()
