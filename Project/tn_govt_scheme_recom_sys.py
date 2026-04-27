@@ -81,3 +81,42 @@ def get_area_type(district):
 
 citizens['district_type'] = citizens['district'].apply(get_area_type)
 citizens.info()
+
+# step:4: ---- EDA Processing (Visualization)
+# age distribution – line are show mean(continuous data)
+plt.hist(citizens['age'], bins=25, color='steelblue', edgecolor='white')
+plt.axvline(citizens['age'].mean(), color='red', linestyle='--', label=f"Mean: {citizens['age'].mean():.1f}")
+plt.title("Age Distribution")
+plt.xlabel("Age")
+plt.ylabel("Count")
+plt.legend()
+plt.show()
+
+# gender split – pie plot are show which gender is high(categorical data)
+gender_counts = citizens['gender'].value_counts()
+gender_mode = gender_counts.index[0]
+plt.pie(gender_counts, labels=gender_counts.index, autopct='%1.1f%%', colors=['#2980B9', '#C0392B', '#8E44AD'])
+plt.title(f"Gender Split  (Mode: {gender_mode})")
+plt.show()
+
+# annual income – mean is affected by outliers & median is more stable. lines added (skewed, both matter)
+plt.hist(citizens['annual_income'], bins=30, color='#F39C12', edgecolor='white')
+plt.axvline(citizens['annual_income'].mean(),   color='red',  linestyle='--', label=f"Mean:   Rs.{citizens['annual_income'].mean()/1000:.0f}K")
+plt.axvline(citizens['annual_income'].median(), color='blue', linestyle='--', label=f"Median: Rs.{citizens['annual_income'].median()/1000:.0f}K")
+plt.title("Annual Income Distribution")
+plt.xlabel("Annual Income")
+plt.ylabel("Count")
+plt.legend()
+plt.show()
+
+# Distribution of occupations in dataset using Horizontal Bar Graph(barh)
+plt.barh(citizens['occupation'].value_counts().index, citizens['occupation'].value_counts().values, color='#16A085')
+plt.title(f"Occupation Breakdown  (Mode: {citizens['occupation'].mode()[0]})")
+plt.xlabel("Count")
+plt.show()
+
+# schemes by category – mode shown in title
+sns.barplot(x=schemes['category'].value_counts().values, y=schemes['category'].value_counts().index, palette='tab10')
+plt.title(f"Schemes by Category  (Mode: {schemes['category'].mode()[0]})")
+plt.xlabel("Count")
+plt.show()
