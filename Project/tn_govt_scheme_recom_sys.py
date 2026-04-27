@@ -179,3 +179,44 @@ def check_eligibility(person, scheme):
         (scheme['marital_status'] == 'Any' or person['marital_status'] == scheme['marital_status']) and
         (scheme['district'] == 'Any' or person['district_type'] == scheme['district'])
     )
+
+# step:7: ---- Building Training Data
+print("\nBuilding training data...")
+start = time.time()
+
+# Sample 100 citizens per occupation to keep it balanced
+sample = pd.concat([
+    citizens[citizens['occupation'] == occ].sample(n=min(100, (citizens['occupation'] == occ).sum()), random_state=42)
+    for occ in citizens['occupation'].unique()
+]).reset_index(drop=True)
+
+# Stores final training rows
+training_rows = []
+for _, row in sample.iterrows():
+    person_dict = {**row.to_dict(), 'district_type': row['district_type']}
+    for _, scheme in schemes.iterrows():
+        training_rows.append({
+            'age'                  : row['age'],
+            'annual_income'        : row['annual_income'],
+            'family_size'          : row['family_size'],
+            'edu_rank'             : row['edu_rank'],
+            'gender'               : row['gender'],
+            'caste'                : row['caste'],
+            'occupation'           : row['occupation'],
+            'education'            : row['education'],
+            'marital_status'       : row['marital_status'],
+            'disability_status'    : row['disability_status'],
+            'district_type'        : row['district_type'],
+            'scheme_min_age'       : scheme['min_age'],
+            'scheme_max_age'       : scheme['max_age'],
+            'scheme_income_limit'  : scheme['income_limit'],
+            'scheme_benefit_amount': scheme['benefit_amount'],
+            'age_in_range'         : int(scheme['min_age'] <= row['age'] <= scheme['max_age']),
+            'income_ok'            : int(row['annual_income'] <= scheme['income_limit']),
+            'income_ratio'         : round(row['annual_income'] / scheme['income_limit'], 4),
+            'age_ratio'            : round(row['age'] / scheme['max_age'], 4),
+            'eligible'             : int(check_eligibility(person_dict, scheme))
+        })
+
+training_data = pd.DataFrame(training_rows)
+print(f"Done. {training_data.shape} | Eligible: {training_data['eligible'].mean()*100:.1f}% | {time.time()-start:.1f}s")
