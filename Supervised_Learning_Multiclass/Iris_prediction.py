@@ -5,6 +5,8 @@ Logistic Regression--- heuristic methods are : one-vs-one & one-vs-rest
 """
 
 import pandas as pd
+from matplotlib import pyplot as plt
+
 data = pd.read_csv('iris_dataset.csv')
 data.info()
 print(data)
@@ -53,3 +55,15 @@ print(y_test_df)
 
 result_df = pd.concat([y_test_df, ovo_pred, ovr_pred], axis = 1)
 print(result_df)
+
+from sklearn.metrics import confusion_matrix
+confusion_matrix = confusion_matrix(y_test, y_pred_ovo)
+print(confusion_matrix)
+
+import seaborn as sns
+data = {'y_Actual': y_test, 'y_Predicted': y_pred_ovo}
+
+df = pd.DataFrame(data, columns = ['y_Actual', 'y_Predicted'])
+clf_confusion_matrix = pd.crosstab(df['y_Actual'], df['y_Predicted'], rownames=['Actual'], colnames=['Predicted'])
+sns.heatmap(clf_confusion_matrix, annot=True)
+plt.show()
