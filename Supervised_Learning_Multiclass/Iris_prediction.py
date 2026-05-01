@@ -29,3 +29,6 @@ clf = LogisticRegression()
 
 ovo = OneVsRestClassifier(clf)
 ovo.fit(X_train, y_train)
+
+ovr = LogisticRegression(multi_class = 'ovr')
+ovr.fit(X_train, y_train)
