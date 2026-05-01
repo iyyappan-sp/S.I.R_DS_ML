@@ -32,3 +32,9 @@ ovo.fit(X_train, y_train)
 
 ovr = LogisticRegression(multi_class = 'ovr')
 ovr.fit(X_train, y_train)
+
+y_pred_ovo = ovo.predict(X_test)
+print(y_pred_ovo)
+
+y_pred_ovr = ovr.predict(X_test)
+print(y_pred_ovr)
