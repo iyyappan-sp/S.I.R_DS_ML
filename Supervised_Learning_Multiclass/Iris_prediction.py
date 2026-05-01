@@ -38,3 +38,18 @@ print(y_pred_ovo)
 
 y_pred_ovr = ovr.predict(X_test)
 print(y_pred_ovr)
+
+ovo_pred = pd.DataFrame(y_pred_ovo, columns = ['ovo_predict_species'])
+print(ovo_pred)
+
+ovr_pred = pd.DataFrame(y_pred_ovr, columns = ['ovr_predict_species'])
+print(ovr_pred)
+
+y_test_df = pd.DataFrame(y_test)
+print(y_test_df)
+
+y_test_df = y_test_df.reset_index(drop = True)
+print(y_test_df)
+
+result_df = pd.concat([y_test_df, ovo_pred, ovr_pred], axis = 1)
+print(result_df)
