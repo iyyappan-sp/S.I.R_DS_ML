@@ -67,3 +67,11 @@ df = pd.DataFrame(data, columns = ['y_Actual', 'y_Predicted'])
 clf_confusion_matrix = pd.crosstab(df['y_Actual'], df['y_Predicted'], rownames=['Actual'], colnames=['Predicted'])
 sns.heatmap(clf_confusion_matrix, annot=True)
 plt.show()
+
+import seaborn as sns
+data = {'y_Actual': y_test, 'y_Predicted': y_pred_ovr}
+
+df = pd.DataFrame(data, columns = ['y_Actual', 'y_Predicted'])
+clf_confusion_matrix = pd.crosstab(df['y_Actual'], df['y_Predicted'], rownames=['Actual'], colnames=['Predicted'])
+sns.heatmap(clf_confusion_matrix, annot=True)
+plt.show()
