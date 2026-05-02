@@ -33,3 +33,20 @@ for kval in kernel:
         cv_scores = cross_val_score(svm.SVC(kernel=kval, C=cval, gamma='auto'), iris_dataset.data, iris_dataset.target, cv=5)
         avg_scores[kval + '_' + str(cval)] = float(np.average(cv_scores))
 print(avg_scores)
+
+# Gridsearch
+from sklearn.model_selection import GridSearchCV
+clf = GridSearchCV(svm.SVC(gamma='auto'), {
+    'C': [1,10,20],
+    'kernel': ['rbf', 'linear']
+}, cv=5, return_train_score=False)
+clf.fit(iris_dataset.data, iris_dataset.target)
+print(clf.cv_results_)
+
+df = pd.DataFrame(clf.cv_results_)
+print(df.head())
+print(df[['param_C', 'param_kernel', 'mean_test_score']])
+
+print(dir(clf))
+print(clf.best_score_)
+print(clf.best_params_)
