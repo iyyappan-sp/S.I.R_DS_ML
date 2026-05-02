@@ -13,3 +13,8 @@ X_train, X_test, y_train, y_test = train_test_split(iris_dataset.data, iris_data
 model = svm.SVC(kernel='rbf', C=30, gamma='auto')
 model.fit(X_train, y_train)
 model.score(X_test, y_test)
+
+from sklearn.model_selection import cross_val_score
+avg_score_linear = cross_val_score(svm.SVC(kernel='linear', C=10, gamma='auto'), iris_dataset.data, iris_dataset.target, cv=5)
+print(avg_score_linear)
+
