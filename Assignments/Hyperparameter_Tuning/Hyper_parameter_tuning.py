@@ -24,3 +24,12 @@ print(avg_score_rbf_1)
 avg_score_rbf_2 = cross_val_score(svm.SVC(kernel='rbf', C=20, gamma='auto'), iris_dataset.data, iris_dataset.target, cv=5)
 print(avg_score_rbf_2)
 
+import numpy as np
+kernel = ['rbf', 'linear']
+C = [1,10,20]
+avg_scores = {}
+for kval in kernel:
+    for cval in C:
+        cv_scores = cross_val_score(svm.SVC(kernel=kval, C=cval, gamma='auto'), iris_dataset.data, iris_dataset.target, cv=5)
+        avg_scores[kval + '_' + str(cval)] = float(np.average(cv_scores))
+print(avg_scores)
