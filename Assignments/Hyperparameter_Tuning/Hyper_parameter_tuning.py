@@ -50,3 +50,17 @@ print(df[['param_C', 'param_kernel', 'mean_test_score']])
 print(dir(clf))
 print(clf.best_score_)
 print(clf.best_params_)
+
+# RandomizedSearchCV
+from sklearn.model_selection import RandomizedSearchCV
+rs = RandomizedSearchCV(svm.SVC(gamma='auto'), {
+    'C': [1, 10, 20],
+    'kernel': ['rbf', 'linear']
+    },
+    cv=5,
+    return_train_score=False,
+    n_iter=2
+)
+rs.fit(iris_dataset.data, iris_dataset.target)
+rs_result_score = pd.DataFrame(rs.cv_results_)[['param_C', 'param_kernel', 'mean_test_score']]
+print(rs_result_score)
