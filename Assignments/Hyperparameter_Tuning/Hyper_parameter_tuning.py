@@ -18,3 +18,9 @@ from sklearn.model_selection import cross_val_score
 avg_score_linear = cross_val_score(svm.SVC(kernel='linear', C=10, gamma='auto'), iris_dataset.data, iris_dataset.target, cv=5)
 print(avg_score_linear)
 
+avg_score_rbf_1 = cross_val_score(svm.SVC(kernel='rbf', C=10, gamma='auto'), iris_dataset.data, iris_dataset.target, cv=5)
+print(avg_score_rbf_1)
+
+avg_score_rbf_2 = cross_val_score(svm.SVC(kernel='rbf', C=20, gamma='auto'), iris_dataset.data, iris_dataset.target, cv=5)
+print(avg_score_rbf_2)
+
