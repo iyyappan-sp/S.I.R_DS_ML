@@ -67,3 +67,26 @@ plt.scatter(X.Age, X.Income)
 plt.xlabel('Age')
 plt.ylabel('Income')
 plt.show()
+
+model_2 = KMeans(n_clusters=3)
+model_2.fit(X)
+y_pred = model_2.predict(X)
+print(y_pred)
+print(X.head())
+
+X['cluster'] = y_pred
+print(X.head())
+
+print(model_2.cluster_centers_)
+center_x = model_2.cluster_centers_[:,0]
+center_y = model_2.cluster_centers_[:,1]
+df1 = X[X['cluster'] == 0]
+df2 = X[X['cluster'] == 1]
+df3 = X[X['cluster'] == 2]
+plt.scatter(df1.Age, df1.Income, color='red')
+plt.scatter(df2.Age, df2.Income, color='green')
+plt.scatter(df3.Age, df3.Income, color='blue')
+plt.scatter(center_x, center_y, color='purple', marker='*')
+plt.xlabel('Age')
+plt.ylabel('Income')
+plt.show()
