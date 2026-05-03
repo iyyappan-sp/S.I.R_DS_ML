@@ -1,4 +1,6 @@
 import pandas as pd
+import warnings
+warnings.filterwarnings("ignore")
 from sklearn import svm, datasets
 iris_dataset = datasets.load_iris()
 df = pd.DataFrame(iris_dataset.data, columns=iris_dataset.feature_names)
