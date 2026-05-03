@@ -90,3 +90,16 @@ plt.scatter(center_x, center_y, color='purple', marker='*')
 plt.xlabel('Age')
 plt.ylabel('Income')
 plt.show()
+
+sse = []
+for k in range(1,10):
+    model = KMeans(n_clusters=k)
+    model.fit(X[['Age', 'Income']])
+    sse.append(model.inertia_)
+
+x = range(1,10)
+y = sse
+plt.xlabel('k')
+plt.ylabel('Sum of Square Error')
+plt.plot(x, y)
+plt.show()
