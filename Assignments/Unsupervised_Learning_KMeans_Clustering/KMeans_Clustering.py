@@ -49,3 +49,21 @@ plt.scatter(center_x, center_y, color='purple', marker='*')
 plt.xlabel('Age')
 plt.ylabel('Income')
 plt.show()
+
+# Minmaxscaler
+from sklearn.preprocessing import MinMaxScaler
+scaler = MinMaxScaler()
+scaler.fit(X[['Income']])
+X.Income = scaler.transform(X[['Income']])
+print(X.head())
+scaler.fit(X[['Age']])
+X.Age = scaler.transform(X[['Age']])
+print(X.head())
+
+X = X.drop('cluster', axis=1)
+print(X)
+
+plt.scatter(X.Age, X.Income)
+plt.xlabel('Age')
+plt.ylabel('Income')
+plt.show()
