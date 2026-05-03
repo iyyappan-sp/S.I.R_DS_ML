@@ -21,3 +21,17 @@ print(y_pred)
 
 X['cluster'] = y_pred
 print(X)
+
+df1 = X[X['cluster'] == 0]
+df2 = X[X['cluster'] == 1]
+df3 = X[X['cluster'] == 2]
+print(df1)
+print(df2)
+print(df3)
+
+plt.scatter(df1.Age, df1.Income, color='red')
+plt.scatter(df2.Age, df2.Income, color='green')
+plt.scatter(df3.Age, df3.Income, color='blue')
+plt.xlabel('Age')
+plt.ylabel('Income')
+plt.show()
