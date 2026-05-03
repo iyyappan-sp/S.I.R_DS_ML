@@ -35,3 +35,17 @@ plt.scatter(df3.Age, df3.Income, color='blue')
 plt.xlabel('Age')
 plt.ylabel('Income')
 plt.show()
+
+print(model.cluster_centers_)
+center_x = model.cluster_centers_[:,0]
+center_y = model.cluster_centers_[:,1]
+plt.scatter(center_x, center_y, color='purple', marker='*')
+plt.show()
+
+plt.scatter(df1.Age, df1.Income, color='red')
+plt.scatter(df2.Age, df2.Income, color='green')
+plt.scatter(df3.Age, df3.Income, color='blue')
+plt.scatter(center_x, center_y, color='purple', marker='*')
+plt.xlabel('Age')
+plt.ylabel('Income')
+plt.show()
