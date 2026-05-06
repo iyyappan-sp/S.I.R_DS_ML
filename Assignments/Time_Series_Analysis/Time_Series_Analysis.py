@@ -55,3 +55,33 @@ movingSTD = indexedData_logScale.rolling(window=12).std()
 plt.plot(indexedData_logScale)
 plt.plot(movingAvg, color='red')
 plt.show()
+
+# Remove trend
+datasetLogScaleMinusMovingAvg = indexedData_logScale - movingAvg
+print(datasetLogScaleMinusMovingAvg.head(12))
+datasetLogScaleMinusMovingAvg.dropna(inplace=True)
+print(datasetLogScaleMinusMovingAvg.head(10))
+
+# Stationarity test function
+def test_stationarity(timeseries):
+    movingAvg = timeseries.rolling(window=12).mean()
+    movingSTD = timeseries.rolling(window=12).std()
+
+    plt.plot(timeseries, color='red', label='Original')
+    plt.plot(movingAvg, color='green', label='Rolling Mean')
+    plt.plot(movingSTD, color='blue', label='Rolling Std')
+
+    plt.legend(loc='best')
+    plt.title('Rolling Mean and Rolling Std')
+    plt.show()
+
+    print("Results of Dickey-Fuller Test:")
+    result = adfuller(timeseries)
+
+    output = pd.Series(result[0:4],
+                       index=['Test Statistic', 'p-value', '#Lags Used', 'Number of Observations Used'])
+
+    for key, value in result[4].items():
+        output['Critical Value (%s)' % key] = value
+
+    print(output)
