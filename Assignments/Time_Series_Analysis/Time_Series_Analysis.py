@@ -145,3 +145,18 @@ plt.plot(results_ARIMA.fittedvalues, color='red', label='Fitted')
 plt.legend(loc='best')
 plt.title('ARIMA Fit')
 plt.show()
+
+# Forecast
+forecast = results_ARIMA.forecast(steps=12)
+# Convert back to original scale
+forecast_values = np.exp(forecast)
+
+print("Forecast Values")
+print(forecast_values)
+
+# Plot forecast
+plt.plot(indexedData, label='Original')
+plt.plot(forecast_values, color='red', label='Forecast')
+plt.legend(loc='best')
+plt.title('Final Forecast')
+plt.show()
