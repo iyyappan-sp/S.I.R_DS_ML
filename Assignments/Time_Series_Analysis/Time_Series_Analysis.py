@@ -105,3 +105,30 @@ plt.show()
 
 datasetLogDiffshifting.dropna(inplace=True)
 test_stationarity(datasetLogDiffshifting)
+
+# Decomposition (Trend, Seasonal, Residual)
+from statsmodels.tsa.seasonal import seasonal_decompose
+decomposed = seasonal_decompose(indexedData_logScale, period=12)
+
+trend = decomposed.trend
+seasonal = decomposed.seasonal
+residual = decomposed.resid
+
+plt.subplot(411)
+plt.plot(indexedData_logScale, label='Original')
+plt.legend(loc='best')
+
+plt.subplot(412)
+plt.plot(trend, label='Trend')
+plt.legend(loc='best')
+
+plt.subplot(413)
+plt.plot(seasonal, label='Seasonality')
+plt.legend(loc='best')
+
+plt.subplot(414)
+plt.plot(residual, label='Residual')
+plt.legend(loc='best')
+
+plt.tight_layout()
+plt.show()
