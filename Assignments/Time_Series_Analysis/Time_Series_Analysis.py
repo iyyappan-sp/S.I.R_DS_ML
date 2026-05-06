@@ -30,3 +30,16 @@ plt.plot(rolstd, color='blue', label='Rolling Std')
 plt.legend(loc='best')
 plt.title('Rolling Mean and Rolling Std')
 plt.show()
+
+# Dickey-Fuller Test
+from statsmodels.tsa.stattools import adfuller
+print("Results of Dickey-Fuller Test:")
+dftest = adfuller(indexedData['#Passengers'])
+
+dfoutput = pd.Series(dftest[0:4], index=['Test Statistic', 'p-value', '#Lags Used', 'Number of Observations Used'])
+
+for key, value in dftest[4].items():
+    dfoutput['Critical Value (%s)' % key] = value
+
+print(dfoutput)
+
