@@ -85,3 +85,23 @@ def test_stationarity(timeseries):
         output['Critical Value (%s)' % key] = value
 
     print(output)
+
+# Apply stationarity test
+test_stationarity(datasetLogScaleMinusMovingAvg)
+# Exponential weighted moving average
+expAvg = indexedData_logScale.ewm(halflife=12).mean()
+
+plt.plot(indexedData_logScale)
+plt.plot(expAvg, color='red')
+plt.show()
+
+datasetLogScaleMinusExpAvg = indexedData_logScale - expAvg
+test_stationarity(datasetLogScaleMinusExpAvg)
+
+# Differencing
+datasetLogDiffshifting = indexedData_logScale - indexedData_logScale.shift()
+plt.plot(datasetLogDiffshifting)
+plt.show()
+
+datasetLogDiffshifting.dropna(inplace=True)
+test_stationarity(datasetLogDiffshifting)
