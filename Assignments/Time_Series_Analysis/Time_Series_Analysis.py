@@ -43,3 +43,15 @@ for key, value in dftest[4].items():
 
 print(dfoutput)
 
+# Log transformation
+indexedData_logScale = np.log(indexedData)
+plt.plot(indexedData_logScale)
+plt.show()
+
+# Moving average
+movingAvg = indexedData_logScale.rolling(window=12).mean()
+movingSTD = indexedData_logScale.rolling(window=12).std()
+
+plt.plot(indexedData_logScale)
+plt.plot(movingAvg, color='red')
+plt.show()
