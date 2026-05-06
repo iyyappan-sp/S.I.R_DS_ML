@@ -132,3 +132,16 @@ plt.legend(loc='best')
 
 plt.tight_layout()
 plt.show()
+
+# ARIMA MODEL
+from statsmodels.tsa.arima.model import ARIMA
+model = ARIMA(indexedData_logScale, order=(2,1,2))
+results_ARIMA = model.fit()
+print(results_ARIMA.summary())
+
+# Plot fitted values
+plt.plot(indexedData_logScale, label='Log Data')
+plt.plot(results_ARIMA.fittedvalues, color='red', label='Fitted')
+plt.legend(loc='best')
+plt.title('ARIMA Fit')
+plt.show()
