@@ -18,3 +18,15 @@ plt.xlabel('Date')
 plt.ylabel('Number of Passengers')
 plt.plot(indexedData)
 plt.show()
+
+# Rolling statistics
+rolmean = indexedData.rolling(window=12).mean()
+rolstd = indexedData.rolling(window=12).std()
+print(rolmean, rolstd)
+
+plt.plot(indexedData, color='red', label='Original')
+plt.plot(rolmean, color='green', label='Rolling Mean')
+plt.plot(rolstd, color='blue', label='Rolling Std')
+plt.legend(loc='best')
+plt.title('Rolling Mean and Rolling Std')
+plt.show()
