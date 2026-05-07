@@ -70,3 +70,10 @@ def show(coef, names):
     return " + ".join(result)
 
 print(show(ridge.coef_, x.columns))
+
+# Plot Ridge coefficients
+plt.figure()
+plt.bar(x.columns, ridge.coef_)
+plt.xticks(rotation=45)
+plt.title("Ridge Feature Importance")
+plt.show()
