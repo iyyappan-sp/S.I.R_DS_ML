@@ -54,3 +54,19 @@ print(fit.support_)
 
 print("Feature ranking")
 print(fit.ranking_)
+
+# Embedded Method (Ridge)
+from sklearn.linear_model import Ridge
+
+ridge = Ridge(alpha=1.0)
+ridge.fit(x, y)
+
+print("Ridge model feature importance")
+
+def show(coef, names):
+    result = []
+    for c, n in zip(coef, names):
+        result.append(str(round(c, 3)) + " * " + n)
+    return " + ".join(result)
+
+print(show(ridge.coef_, x.columns))
