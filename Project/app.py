@@ -8,16 +8,18 @@ app = Flask(__name__)
 
 # --- 1. Load trained model & data ---
 try:
-    # This bundle contains the model, encoders, and district lists
     bundle = joblib.load('scheme_project.pkl')
-    model = bundle['model']
-    encoders = bundle['encoders']
-    edu_levels = bundle['edu_levels']
+    model        = bundle['model']
+    encoders     = bundle['encoders']
+    edu_levels   = bundle['edu_levels']
     coastal_districts = set(bundle['coastal'])
-    urban_districts = set(bundle['urban'])
+    urban_districts   = set(bundle['urban'])
 
-    # Load scheme details for metadata
     schemes_df = pd.read_csv('tn_schemes.csv')
+
+    # Pre-compute max benefit for normalisation (used in scoring)
+    MAX_BENEFIT = schemes_df['benefit_amount'].max()
+
     print("API: Model and datasets loaded successfully.")
 except Exception as e:
     print(f"API Error: Could not load assets. {e}")
@@ -27,27 +29,65 @@ except Exception as e:
 
 def get_area_type(district):
     if district in coastal_districts: return 'Coastal'
-    if district in urban_districts: return 'Urban'
+    if district in urban_districts:   return 'Urban'
     return 'Rural'
 
 
 def check_eligibility(person, scheme):
-    """Checks basic rules before letting the ML model score it."""
-    # Gender & Age
-    if scheme['gender'] != 'Any' and person['gender'] != scheme['gender']: return False
-    if not (scheme['min_age'] <= person['age'] <= scheme['max_age']): return False
+    """Full eligibility check — mirrors the original training script exactly."""
 
-    # Income & Caste
-    if person['annual_income'] > scheme['income_limit']: return False
+    # 1. Disability / Category check
+    if scheme['category'] == 'Disability':
+        if scheme['scheme_name'] == 'Transgender Welfare Scheme':
+            if person['gender'] != 'Transgender':
+                return False
+        elif person['disability_status'] != 'Yes':
+            return False
 
+    # 2. Caste check
     p_caste = person['caste']
     s_caste = scheme['caste']
     if s_caste != 'Any':
         if s_caste == 'BC/MBC' and p_caste not in ['BC', 'MBC']: return False
-        if s_caste == 'SC/ST' and p_caste not in ['SC', 'ST']: return False
+        if s_caste == 'SC/ST'  and p_caste not in ['SC', 'ST']:   return False
         if s_caste not in ['BC/MBC', 'SC/ST'] and p_caste != s_caste: return False
 
-    return True
+    # 3. Occupation check
+    if scheme['occupation'] != 'Any':
+        if person['occupation'] not in [o.strip() for o in scheme['occupation'].split('/')]:
+            return False
+
+    # 4. Education check (minimum level required)
+    if scheme['education'] != 'Any':
+        if edu_levels.get(person['education'], 0) < edu_levels.get(scheme['education'], 0):
+            return False
+
+    # 5. Gender, Age, Income, Marital Status, District checks
+    return (
+        (scheme['gender'] == 'Any' or person['gender'] == scheme['gender']) and
+        scheme['min_age'] <= person['age'] <= scheme['max_age'] and
+        person['annual_income'] <= scheme['income_limit'] and
+        (scheme['marital_status'] == 'Any' or person['marital_status'] == scheme['marital_status']) and
+        (scheme['district'] == 'Any' or person['district_type'] == scheme['district'])
+    )
+
+
+def compute_match_score(person, scheme):
+    """
+    Produces a meaningful 0-100 match score based on 3 weighted factors:
+      - Income fit  (40%) : how far below the income limit the person is
+      - Age fit     (30%) : how close the person's age is to the centre of the scheme's age band
+      - Benefit     (30%) : how large the benefit is relative to all schemes
+    """
+    age_center  = (scheme['min_age'] + scheme['max_age']) / 2
+    age_range   = max(scheme['max_age'] - scheme['min_age'], 1)
+
+    income_fit  = 1 - (person['annual_income'] / scheme['income_limit'])
+    age_fit     = 1 - abs(person['age'] - age_center) / age_range
+    benefit_fit = scheme['benefit_amount'] / MAX_BENEFIT
+
+    raw = income_fit * 0.4 + age_fit * 0.3 + benefit_fit * 0.3
+    return round(max(0.0, min(raw * 100, 100.0)), 2)
 
 
 # --- 3. API Routes ---
@@ -60,72 +100,54 @@ def home():
 @app.route('/recommend', methods=['POST'])
 def recommend():
     try:
-        # Get data from user request
         data = request.json
 
-        # Prepare person dictionary
         person = {
-            'age': int(data.get('age', 0)),
-            'gender': data.get('gender', ''),
-            'caste': data.get('caste', ''),
-            'occupation': data.get('occupation', 'Any'),
-            'education': data.get('education', 'Any'),
-            'annual_income': float(data.get('annual_income', 0)),
-            'marital_status': data.get('marital_status', 'Any'),
+            'age'              : int(data.get('age', 0)),
+            'gender'           : data.get('gender', ''),
+            'caste'            : data.get('caste', ''),
+            'occupation'       : data.get('occupation', 'Any'),
+            'education'        : data.get('education', 'Any'),
+            'annual_income'    : float(data.get('annual_income', 0)),
+            'marital_status'   : data.get('marital_status', 'Any'),
             'disability_status': data.get('disability_status', 'No'),
-            'district': data.get('district', 'Chennai'),
-            'family_size': int(data.get('family_size', 4))
+            'district'         : data.get('district', 'Chennai'),
+            'family_size'      : int(data.get('family_size', 4))
         }
 
-        # Derive features
+        # Derive district_type — must be set before check_eligibility
         area = get_area_type(person['district'])
-        edu_rank = edu_levels.get(person['education'], 0)
+        person['district_type'] = area
 
-        # Filter schemes and prepare scoring matrix
-        valid_schemes = []
-        matrix = []
-
-        def encode(col, val):
-            return int(encoders[col].transform([val])[0]) if val in encoders[col].classes_ else 0
-
+        # --- Filter eligible schemes & score them ---
+        results = []
         for _, s in schemes_df.iterrows():
             if check_eligibility(person, s):
-                valid_schemes.append(s.to_dict())
-                # Create the same 19 features used during training
-                matrix.append([
-                    person['age'], encode('gender', person['gender']), encode('caste', person['caste']),
-                    encode('occupation', person['occupation']), encode('education', person['education']),
-                    person['annual_income'], encode('marital_status', person['marital_status']),
-                    encode('disability_status', person['disability_status']), encode('district_type', area),
-                    person['family_size'], edu_rank,
-                    s['min_age'], s['max_age'], s['income_limit'], s['benefit_amount'],
-                    1, 1,  # age_in_range, income_ok
-                    round(person['annual_income'] / s['income_limit'], 4),
-                    round(person['age'] / s['max_age'], 4)
-                ])
+                scheme_dict = s.to_dict()
+                scheme_dict['match_percentage'] = compute_match_score(person, s)
+                results.append(scheme_dict)
 
-        if not valid_schemes:
-            return jsonify({"message": "No eligible schemes found.", "results": []})
+        if not results:
+            return jsonify({
+                "status"         : "success",
+                "message"        : "No eligible schemes found. Visit the nearest Common Service Centre.",
+                "total_found"    : 0,
+                "recommendations": []
+            })
 
-        # Predict match probability
-        probs = model.predict_proba(np.array(matrix))[:, 1]
-
-        # Attach scores and sort
-        for i, scheme in enumerate(valid_schemes):
-            scheme['match_percentage'] = round(float(probs[i] * 100), 2)
-
-        sorted_results = sorted(valid_schemes, key=lambda x: x['match_percentage'], reverse=True)
+        # Sort by match score descending, return top 5
+        results.sort(key=lambda x: x['match_percentage'], reverse=True)
 
         return jsonify({
-            "status": "success",
-            "total_found": len(sorted_results),
-            "recommendations": sorted_results[:5]  # Return top 5
+            "status"         : "success",
+            "total_found"    : len(results),
+            "recommendations": results[:5]
         })
 
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 400
 
 
-# ✅ Fix - binds to 0.0.0.0
+# --- 4. Run ---
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
