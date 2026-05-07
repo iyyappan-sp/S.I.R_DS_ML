@@ -29,3 +29,10 @@ k_features = k_best.transform(x)
 
 print("Selected features first 5 rows")
 print(k_features[0:5, :])
+
+# Plot Chi-Square scores
+plt.figure()
+plt.bar(x.columns, k_best.scores_)
+plt.xticks(rotation=45)
+plt.title("Chi-Square Feature Scores")
+plt.show()
