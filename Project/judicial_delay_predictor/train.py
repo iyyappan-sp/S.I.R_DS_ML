@@ -74,3 +74,33 @@ ax.set_xlabel("Median delay (days)")
 ax.set_title("Which case types take the longest to resolve?")
 plt.tight_layout()
 plt.show()
+
+# Feature engineering
+features = [c for c in ["state_code", "dist_code", "type_name", "year", "female_petitioner", "judge_position"] if c in df.columns]
+
+encoders = {}
+for col in df[features].select_dtypes("object").columns:
+    le = LabelEncoder()
+    df[col] = le.fit_transform(df[col].astype(str).fillna("unknown"))
+    encoders[col] = le
+
+df[features] = df[features].fillna(0)
+
+X = df[features]
+y = df["delay_class"]
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
+
+X_train, y_train = SMOTE(random_state=42).fit_resample(X_train, y_train)
+
+print("\nTraining model...")
+model = XGBClassifier(n_estimators=300, max_depth=6, learning_rate=0.1, eval_metric="mlogloss", random_state=42, n_jobs=-1)
+model.fit(X_train, y_train)
+
+print("\nEvaluation:")
+print(classification_report(y_test, model.predict(X_test), target_names=["Fast", "Moderate", "High", "Severe"]))
+
+joblib.dump(model,    "model.pkl")
+joblib.dump(encoders, "encoders.pkl")
+joblib.dump(features, "features.pkl")
+print("Model saved.")
