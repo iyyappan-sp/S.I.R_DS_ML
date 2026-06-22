@@ -94,3 +94,23 @@ ConfusionMatrixDisplay(confusion_matrix(y_test, model.predict(X_test)), display_
 confusion_plot.set_title("Confusion Matrix")
 plt.tight_layout()
 plt.show()
+
+# SHAP
+print("\nComputing SHAP values...")
+model.get_booster().set_param({'base_score': 0.5})
+explainer = shap.TreeExplainer(model)
+sample = X_test.sample(300, random_state=42)
+shap_values = explainer.shap_values(sample)
+
+plt.figure()
+shap.summary_plot(shap_values, sample, show=False, plot_size=(10, 5))
+plt.title("SHAP — which features drive fraud predictions?")
+plt.tight_layout()
+plt.show()
+
+# Save the model
+joblib.dump(model,     "model.pkl")
+joblib.dump(encoders,  "encoders.pkl")
+joblib.dump(features,  "features.pkl")
+joblib.dump(explainer, "explainer.pkl")
+print("\nModel saved.")
