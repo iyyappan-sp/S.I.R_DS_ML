@@ -57,3 +57,25 @@ merchant_bar.set_title("Which merchant category is most targeted by fraud?")
 merchant_bar.set_xlabel("Fraud rate (%)")
 plt.tight_layout()
 plt.show()
+
+# Feature engineering
+features = [
+    "transaction type", "merchant_category", "amount (INR)",
+    "transaction_status", "sender_age_group", "receiver_age_group",
+    "sender_state", "sender_bank", "receiver_bank",
+    "device_type", "network_type",
+    "hour_of_day", "is_weekend"
+]
+
+encoders = {}
+for col in df[features].select_dtypes("object").columns:
+    le = LabelEncoder()
+    df[col] = le.fit_transform(df[col].astype(str))
+    encoders[col] = le
+
+X = df[features]
+y = df["fraud_flag"]
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
+X_train, y_train = SMOTE(random_state=42).fit_resample(X_train, y_train)
+print("\nAfter SMOTE — Training samples:", len(X_train))
