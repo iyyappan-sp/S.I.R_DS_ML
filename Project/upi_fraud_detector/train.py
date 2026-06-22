@@ -79,3 +79,18 @@ y = df["fraud_flag"]
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
 X_train, y_train = SMOTE(random_state=42).fit_resample(X_train, y_train)
 print("\nAfter SMOTE — Training samples:", len(X_train))
+
+# Train
+print("\nTraining model...")
+model = XGBClassifier( n_estimators=300, max_depth=6, learning_rate=0.1, eval_metric="logloss", random_state=42, n_jobs=-1)
+model.fit(X_train, y_train)
+
+# Evaluate
+print("\nEvaluation:")
+print(classification_report(y_test, model.predict(X_test), target_names=["Genuine", "Fraud"]))
+
+confusion, confusion_plot = plt.subplots(figsize=(6, 5))
+ConfusionMatrixDisplay(confusion_matrix(y_test, model.predict(X_test)), display_labels=["Genuine", "Fraud"]).plot(ax=confusion_plot, colorbar=False, cmap="Reds")
+confusion_plot.set_title("Confusion Matrix")
+plt.tight_layout()
+plt.show()
